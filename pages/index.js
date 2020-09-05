@@ -1,18 +1,16 @@
 import Head from "next/head";
-import fetch from "isomorphic-unfetch";
 import Link from "next/link";
+import ItemGateway from "../components/itemGateway";
+import useSWR from "swr";
 
-// This gets called on every request
-export async function getServerSideProps() {
-  // Fetch data from external API
-  const res = await fetch(`http://localhost:3000/api/gateways`);
-  const data = await res.json();
+const fetcher = (url) => fetch(url).then((res) => res.json());
 
-  // Pass data to the page via props
-  return { props: { data } };
-}
+function Home() {
+  const { data, error } = useSWR("/api/gateways", fetcher);
 
-function Home({ data }) {
+  if (error) return <div className="text-center py-8">Failed to load</div>;
+  if (!data) return <div className="text-center py-8">Loading...</div>;
+
   return (
     <>
       <Head>
@@ -24,20 +22,7 @@ function Home({ data }) {
         {data.gateways.length > 0 ? (
           <>
             {data.gateways.map((item, index) => (
-              <Link href={`/gateway/${item._id}`} key={index}>
-                <a>
-                  <div className="bg-gray-200 p-5 mb-3 flex justify-between align-middle rounded hover:bg-gray-300 hover:shadow-md transform hover:-translate-y-1 transition ease-out duration-200">
-                    <div>
-                      <strong>{item.name}</strong> - {item.serial} @ {item.ipv4}
-                    </div>
-                    <div>
-                      <span className="bg-black text-white rounded py-1 px-2 text-xs inline">
-                        {item.devices.length}
-                      </span>
-                    </div>
-                  </div>
-                </a>
-              </Link>
+              <ItemGateway key={index} item={item} />
             ))}
           </>
         ) : (
