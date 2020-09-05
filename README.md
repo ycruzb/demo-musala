@@ -1,10 +1,15 @@
-# Managing Gateways Demo
+# Gateways Management Demo
 
 ## Technologies involved
 
+- GitHub
 - NextJS
 - TailwindCSS
 - MongoDB Atlas
+
+## Database
+
+- MongoDB Atlas database with a collection called **gateways**
 
 ## Local instalation
 
