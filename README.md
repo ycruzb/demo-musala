@@ -10,9 +10,9 @@
 
 1. Clone the repo
 2. Run the following command inside the folder of the repo: `npm i`
-3. Create an **.env.local** file inside the folder of the repo with the following code: `MONGODB_URI=xxx` where **xxx** is the MongoDB uri provided and `BASE_PATH=http://localhost:3000`
+3. Create an **.env.local** file inside the folder of the repo with the following variables declarations: `MONGODB_URI=xxx` where **xxx** is the provided MongoDB uri and `BASE_PATH=http://localhost:3000`
 
-## Run the project on locally
+## Run the project locally
 
 1. Run the following command inside the folder of the repo: `npm run dev`
 
