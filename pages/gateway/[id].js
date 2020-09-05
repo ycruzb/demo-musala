@@ -5,6 +5,7 @@ import fetch from "isomorphic-unfetch";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import uid from "uid";
+import ItemDevice from "../../components/itemDevice";
 
 export default function Gateway({ gatewayData }) {
   const router = useRouter();
@@ -22,9 +23,7 @@ export default function Gateway({ gatewayData }) {
   const handleDelete = async (e) => {
     e.preventDefault();
 
-    const res = await fetch(
-      `http://localhost:3000/api/gateway/delete/${gatewayData._id}`
-    );
+    const res = await fetch(`/api/gateway/delete/${gatewayData._id}`);
 
     const result = await res.json();
 
@@ -44,7 +43,7 @@ export default function Gateway({ gatewayData }) {
 
     const payload = { gateway_id: gatewayData._id, device: data };
 
-    const res = await fetch("http://localhost:3000/api/device/add", {
+    const res = await fetch("/api/device/add", {
       method: "post",
       body: JSON.stringify(payload),
     });
@@ -68,7 +67,7 @@ export default function Gateway({ gatewayData }) {
   const handleDeleteDevice = async (uid) => {
     const payload = { gateway_id: gatewayData._id, device_uid: uid };
 
-    const res = await fetch("http://localhost:3000/api/device/delete", {
+    const res = await fetch("/api/device/delete", {
       method: "post",
       body: JSON.stringify(payload),
     });
@@ -134,47 +133,12 @@ export default function Gateway({ gatewayData }) {
             <>
               <p className="text-center pt-6 pb-4 text-xl px-6">Devices</p>
               {devices.map((device, index) => (
-                <p
-                  className="text-center py-2 mx-6 flex flex-col md:flex-row md:justify-around bg-gray-200 rounded mb-4 hover:bg-gray-300 hover:shadow-md transform hover:-translate-y-1 transition ease-out duration-200"
+                <ItemDevice
                   key={index}
-                >
-                  {" "}
-                  <span>
-                    <strong>{index + 1}</strong>
-                  </span>
-                  <span>
-                    uid: <strong>{device.uid}</strong>
-                  </span>
-                  <span>
-                    vendor: <strong>{device.vendor}</strong>
-                  </span>
-                  <span>
-                    date: <strong>{device.date}</strong>
-                  </span>
-                  <span>
-                    status:{" "}
-                    <strong>
-                      {parseInt(device.status) === 1 ? (
-                        <span className="text-green-800">Online</span>
-                      ) : (
-                        <span className="text-red-800">Offline</span>
-                      )}
-                    </strong>
-                  </span>
-                  <span>
-                    <button
-                      onClick={() => handleDeleteDevice(device.uid)}
-                      className="flex flex-row w-full justify-center"
-                    >
-                      <img
-                        className="w-5 pr-1 block mt-1"
-                        src="/squared-minus.svg"
-                        alt=""
-                      />{" "}
-                      <span className="text-red-800">Delete</span>
-                    </button>
-                  </span>
-                </p>
+                  device={device}
+                  index={index}
+                  handleDeleteDevice={handleDeleteDevice}
+                />
               ))}
             </>
           ) : (

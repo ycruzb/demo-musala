@@ -11,7 +11,7 @@ function GatewayAdd() {
 
   const onSubmit = async (data, e) => {
     setAdding(true);
-    const res = await fetch("http://localhost:3000/api/gateway/add", {
+    const res = await fetch("/api/gateway/add", {
       method: "post",
       body: JSON.stringify(data),
     });
