@@ -6,6 +6,7 @@
 - NextJS
 - TailwindCSS
 - MongoDB Atlas
+- Vercel
 
 ## Database
 
