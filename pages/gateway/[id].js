@@ -1,39 +1,19 @@
 import Head from "next/head";
+import { getAllGatewaysIds, getGatewayData } from "../../lib/gateways";
 import Link from "next/link";
+import fetch from "isomorphic-unfetch";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import uid from "uid";
-import ItemDevice from "../../components/itemDevice";
-import useSWR from "swr";
 
-const fetcher = async (url) => {
-  const res = await fetch(url);
-  const data = await res.json();
-
-  if (res.status !== 200) {
-    throw new Error(data.message);
-  }
-  return data;
-};
-
-export default function Gateway() {
+export default function Gateway({ gatewayData }) {
   const router = useRouter();
-
-  const { query } = useRouter();
-
-  const { gatewayData, error } = useSWR(
-    () => query.id && `/api/gateway/${query.id}`,
-    fetcher
-  );
-
-  if (error) return <div className="text-center py-8">{error.message}</div>;
-  if (!gatewayData) return <div className="text-center py-8">Loading...</div>;
-
-  const [devices, setDevices] = React.useState([]);
 
   const [formShown, setFormShown] = React.useState(false);
 
   const [adding, setAdding] = React.useState(false);
+
+  const [devices, setDevices] = React.useState(gatewayData.devices);
 
   const [errorShow, setErrorShown] = React.useState(false);
 
@@ -42,10 +22,11 @@ export default function Gateway() {
   const handleDelete = async (e) => {
     e.preventDefault();
 
-    const { result, error } = useSWR(
-      `/api/gateway/delete/${gatewayData._id}`,
-      fetcher
+    const res = await fetch(
+      `http://localhost:3000/api/gateway/delete/${gatewayData._id}`
     );
+
+    const result = await res.json();
 
     if (result.result.ok) {
       // Make sure we're in the browser
@@ -153,12 +134,47 @@ export default function Gateway() {
             <>
               <p className="text-center pt-6 pb-4 text-xl px-6">Devices</p>
               {devices.map((device, index) => (
-                <ItemDevice
+                <p
+                  className="text-center py-2 mx-6 flex flex-col md:flex-row md:justify-around bg-gray-200 rounded mb-4 hover:bg-gray-300 hover:shadow-md transform hover:-translate-y-1 transition ease-out duration-200"
                   key={index}
-                  index={index}
-                  device={device}
-                  handleDeleteDevice={handleDeleteDevice}
-                />
+                >
+                  {" "}
+                  <span>
+                    <strong>{index + 1}</strong>
+                  </span>
+                  <span>
+                    uid: <strong>{device.uid}</strong>
+                  </span>
+                  <span>
+                    vendor: <strong>{device.vendor}</strong>
+                  </span>
+                  <span>
+                    date: <strong>{device.date}</strong>
+                  </span>
+                  <span>
+                    status:{" "}
+                    <strong>
+                      {parseInt(device.status) === 1 ? (
+                        <span className="text-green-800">Online</span>
+                      ) : (
+                        <span className="text-red-800">Offline</span>
+                      )}
+                    </strong>
+                  </span>
+                  <span>
+                    <button
+                      onClick={() => handleDeleteDevice(device.uid)}
+                      className="flex flex-row w-full justify-center"
+                    >
+                      <img
+                        className="w-5 pr-1 block mt-1"
+                        src="/squared-minus.svg"
+                        alt=""
+                      />{" "}
+                      <span className="text-red-800">Delete</span>
+                    </button>
+                  </span>
+                </p>
               ))}
             </>
           ) : (
@@ -245,4 +261,21 @@ export default function Gateway() {
       )}
     </>
   );
+}
+
+export async function getStaticPaths() {
+  const paths = await getAllGatewaysIds();
+  return {
+    paths,
+    fallback: false,
+  };
+}
+
+export async function getStaticProps({ params }) {
+  const gatewayData = await getGatewayData(params.id);
+  return {
+    props: {
+      gatewayData,
+    },
+  };
 }
