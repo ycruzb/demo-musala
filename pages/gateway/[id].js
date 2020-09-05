@@ -1,20 +1,41 @@
 import Head from "next/head";
-import { getAllGatewaysIds, getGatewayData } from "../../lib/gateways";
 import Link from "next/link";
 import fetch from "isomorphic-unfetch";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import uid from "uid";
 import ItemDevice from "../../components/itemDevice";
+import useSWR from "swr";
 
-export default function Gateway({ gatewayData }) {
+const fetcher = async (url) => {
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (res.status !== 200) {
+    throw new Error(data.message);
+  }
+  return data;
+};
+
+export default function Gateway() {
   const router = useRouter();
+
+  const { data, error } = useSWR(
+    () => router.query.id && `/api/gateway/${router.query.id}`,
+    fetcher
+  );
+
+  const [devices, setDevices] = React.useState([]);
+
+  React.useEffect(() => {
+    if (data) {
+      setDevices(data.gateway.devices);
+    }
+  }, [data]);
 
   const [formShown, setFormShown] = React.useState(false);
 
   const [adding, setAdding] = React.useState(false);
-
-  const [devices, setDevices] = React.useState(gatewayData.devices);
 
   const [errorShow, setErrorShown] = React.useState(false);
 
@@ -23,7 +44,7 @@ export default function Gateway({ gatewayData }) {
   const handleDelete = async (e) => {
     e.preventDefault();
 
-    const res = await fetch(`/api/gateway/delete/${gatewayData._id}`);
+    const res = await fetch(`/api/gateway/delete/${router.query.id}`);
 
     const result = await res.json();
 
@@ -35,13 +56,13 @@ export default function Gateway({ gatewayData }) {
     }
   };
 
-  const onSubmit = async (data, e) => {
+  const onSubmit = async (datad, e) => {
     setAdding(true);
 
     const device_uid = uid();
-    data.uid = device_uid;
+    datad.uid = device_uid;
 
-    const payload = { gateway_id: gatewayData._id, device: data };
+    const payload = { gateway_id: router.query.id, device: datad };
 
     const res = await fetch("/api/device/add", {
       method: "post",
@@ -52,7 +73,7 @@ export default function Gateway({ gatewayData }) {
 
     if (res.status === 200) {
       let devs = devices;
-      devs.push(data);
+      devs.push(datad);
       setDevices(devs);
 
       setFormShown(false);
@@ -65,7 +86,7 @@ export default function Gateway({ gatewayData }) {
   };
 
   const handleDeleteDevice = async (uid) => {
-    const payload = { gateway_id: gatewayData._id, device_uid: uid };
+    const payload = { gateway_id: router.query.id, device_uid: uid };
 
     const res = await fetch("/api/device/delete", {
       method: "post",
@@ -84,10 +105,13 @@ export default function Gateway({ gatewayData }) {
     }
   };
 
+  if (error) return <div className="text-center py-8">Failed to load</div>;
+  if (!data) return <div className="text-center py-8">Loading...</div>;
+
   return (
     <>
       <Head>
-        <title>{gatewayData.name} | Demo for MusalaSoft</title>
+        <title>{data.gateway.name} | Demo for MusalaSoft</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -119,14 +143,16 @@ export default function Gateway({ gatewayData }) {
             </a>
           </div>
 
-          <h1 className="text-center pb-6 text-3xl px-6">{gatewayData.name}</h1>
+          <h1 className="text-center pb-6 text-3xl px-6">
+            {data.gateway.name}
+          </h1>
           <p className="text-center text-xl flex flex-col md:flex-row md:justify-around px-6">
             <span>
-              serial: <strong>{gatewayData.serial}</strong>
+              serial: <strong>{data.gateway.serial}</strong>
             </span>
             <span>
               {" "}
-              ipv4: <strong>{gatewayData.ipv4}</strong>
+              ipv4: <strong>{data.gateway.ipv4}</strong>
             </span>
           </p>
           {devices.length > 0 ? (
@@ -165,7 +191,7 @@ export default function Gateway({ gatewayData }) {
         <>
           <div className="grid grid-flow-row grid-cols-1 gap-4 pt-2 pb-4 px-6 w-full sm:max-w-screen-sm mx-auto">
             <h1 className="text-2xl pt-6">
-              Add Device to <strong>{gatewayData.name}</strong>
+              Add Device to <strong>{data.gateway.name}</strong>
             </h1>
             <form onSubmit={handleSubmit(onSubmit)} className="max-w-full">
               <input
@@ -225,21 +251,4 @@ export default function Gateway({ gatewayData }) {
       )}
     </>
   );
-}
-
-export async function getStaticPaths() {
-  const paths = await getAllGatewaysIds();
-  return {
-    paths,
-    fallback: false,
-  };
-}
-
-export async function getStaticProps({ params }) {
-  const gatewayData = await getGatewayData(params.id);
-  return {
-    props: {
-      gatewayData,
-    },
-  };
 }

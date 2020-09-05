@@ -1,19 +1,17 @@
 import Head from "next/head";
-import fetch from "isomorphic-unfetch";
 import Link from "next/link";
 import ItemGateway from "../components/itemGateway";
 
-// This gets called on every request
-export async function getServerSideProps() {
-  // Fetch data from external API
-  const res = await fetch(`${process.env.BASE_PATH}/api/gateways`);
-  const data = await res.json();
+import useSWR from "swr";
 
-  // Pass data to the page via props
-  return { props: { data } };
-}
+const fetcher = (url) => fetch(url).then((res) => res.json());
 
-function Home({ data }) {
+function Home() {
+  const { data, error } = useSWR("/api/gateways", fetcher);
+
+  if (error) return <div className="text-center py-8">Failed to load</div>;
+  if (!data) return <div className="text-center py-8">Loading...</div>;
+
   return (
     <>
       <Head>
