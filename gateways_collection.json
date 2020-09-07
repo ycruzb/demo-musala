@@ -1,0 +1,72 @@
+[{
+  "_id": {
+    "$oid": "5f53d9c77ff0b00008d0b540"
+  },
+  "name": "Gateway1",
+  "serial": "11223344",
+  "ipv4": "1.1.1.1",
+  "devices": [
+    {
+      "vendor": "44444",
+      "date": "2020-02-02",
+      "status": "0",
+      "uid": "xr7b0txd3fo"
+    },
+    {
+      "vendor": "55555",
+      "date": "2020-03-30",
+      "status": "1",
+      "uid": "ab0o9oavx69"
+    },
+    {
+      "vendor": "33333",
+      "date": "2020-09-06",
+      "status": "1",
+      "uid": "ufxlco8rpc4"
+    },
+    {
+      "vendor": "444",
+      "date": "2020-09-06",
+      "status": "0",
+      "uid": "u9vjmivps6k"
+    },
+    {
+      "vendor": "5555",
+      "date": "2020-09-06",
+      "status": "1",
+      "uid": "lxzmog3cm21"
+    },
+    {
+      "vendor": "6666",
+      "date": "2020-09-06",
+      "status": "1",
+      "uid": "v8ee5eongc2"
+    },
+    {
+      "vendor": "77777",
+      "date": "2020-09-06",
+      "status": "1",
+      "uid": "0ene1t5gox8"
+    },
+    {
+      "vendor": "888",
+      "date": "2020-09-06",
+      "status": "1",
+      "uid": "mdbbvsz8bnx"
+    },
+    {
+      "vendor": "999",
+      "date": "2020-09-05",
+      "status": "1",
+      "uid": "8s6q78egh0o"
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "5f53d9da7ff0b00008d0b541"
+  },
+  "name": "Gateway2",
+  "serial": "223344",
+  "ipv4": "2.2.2.2",
+  "devices": []
+}]

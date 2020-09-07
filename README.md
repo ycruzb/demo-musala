@@ -10,7 +10,7 @@
 
 ## Database
 
-- MongoDB Atlas database with a collection called **gateways**
+- MongoDB Atlas database with a collection called **gateways**. You can import the file **gateways_collection.json** located on the root folder of this repo.
 
 ## Local instalation
 
